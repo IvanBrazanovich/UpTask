@@ -40,7 +40,7 @@ const obtenerProyecto = async (req, res) => {
   const tareas = await Tarea.find().where("proyecto").equals(proyecto.id);
   console.log(tareas);
 
-  res.json({ proyecto, tareas });
+  res.json({ proyecto });
 };
 
 const editarProyecto = async (req, res) => {

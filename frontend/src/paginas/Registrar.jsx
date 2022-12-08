@@ -57,6 +57,11 @@ const Registrar = () => {
         msg: resTwo.msg,
         error: false,
       });
+
+      setEmail("");
+      setNombre("");
+      setPassword("");
+      setRepetirPassword("");
     } catch (err) {
       const message = err.message ? "Hubo un error" : err;
       setAlert({

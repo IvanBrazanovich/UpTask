@@ -42,7 +42,7 @@ const OlvidePassword = () => {
     } catch (err) {
       const message = err.message ? "Hubo un error" : err;
       setAlert({
-        msg: "Email no válido",
+        msg: message,
         error: true,
       });
     }

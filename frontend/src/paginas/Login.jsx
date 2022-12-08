@@ -1,7 +1,64 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Alert from "../components/Alert";
+import AuthContext from "../context/AuthProvider";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [alert, setAlert] = useState({});
+
+  const { setAuth } = useContext(AuthContext);
+
+  //React Router
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if ([email, password].map((item) => item.trim()).includes("")) {
+      setAlert({
+        msg: "Todos los campos son obligatorios",
+        error: true,
+      });
+      return;
+    }
+
+    //Fetch data
+    try {
+      const resOne = await fetch("http://localhost:4000/api/usuarios/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const resTwo = await resOne.json();
+
+      if (!resOne.ok) {
+        throw resTwo.msg;
+      }
+
+      //Get token from local storage
+      localStorage.setItem("token", resTwo.token);
+
+      //Send authentication to context
+      setAuth(resTwo);
+
+      //Reset form
+      setEmail("");
+      setPassword("");
+
+      //Go to proyectos page
+      navigate("/proyectos");
+    } catch (error) {
+      setAlert({
+        msg: error,
+        error: true,
+      });
+    }
+  };
+
   return (
     <div className="mx-auto w-3/5 lg:w-2/5 text-slate-600  ">
       <h2 className="text-3xl font-black text-sky-600 capitalize">
@@ -10,7 +67,12 @@ const Login = () => {
       </h2>
 
       {/* Formulario */}
-      <form className="bg-white mt-5 rounded-md py-10 px-5 shadow-md">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white mt-5 rounded-md py-10 px-5 shadow-md"
+      >
+        {alert.msg && <Alert alerta={alert} />}
+
         <div className="mb-5">
           <label className="block font-bold uppercase" htmlFor="email">
             {" "}
@@ -20,6 +82,8 @@ const Login = () => {
             type="email"
             id="email"
             name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Email de Registro"
             className="px-2 bg-slate-50 block w-full  py-1 mt-2"
           />
@@ -32,12 +96,17 @@ const Login = () => {
             type="password"
             id="password"
             name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Password de Registro"
             className="px-2 bg-slate-50 block w-full  py-1 mt-2"
           />
         </div>
 
-        <button className="text-white bg-sky-800 w-full py-2 uppercase font-bold">
+        <button
+          type="submit"
+          className="text-white bg-sky-800 w-full py-2 uppercase font-bold"
+        >
           Iniciar Sesión
         </button>
       </form>
