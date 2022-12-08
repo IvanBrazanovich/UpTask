@@ -9,7 +9,7 @@ const FormularioProyecto = () => {
   const [cliente, setCliente] = useState("");
   const [fechaEntrega, setFechaEntrega] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [idProyecto, setIdProyecto] = useState(null);
+  const [id, setId] = useState(null);
 
   //Use Context
   const { mostrarAlerta, agregarProyecto, alerta, proyecto } =
@@ -25,7 +25,7 @@ const FormularioProyecto = () => {
       setCliente(cliente);
       setFechaEntrega(fechaEntrega.split("T")[0]);
       setDescripcion(descripcion);
-      setIdProyecto(_id);
+      setId(_id);
     }
   }, []);
 
@@ -44,15 +44,15 @@ const FormularioProyecto = () => {
       return;
     }
 
-    agregarProyecto({
-      idProyecto,
+    await agregarProyecto({
+      id,
       nombre,
       cliente,
       fechaEntrega,
       descripcion,
     });
 
-    setIdProyecto(null);
+    setId(null);
     setNombre("");
     setCliente("");
     setFechaEntrega("");
