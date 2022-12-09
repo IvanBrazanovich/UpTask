@@ -28,6 +28,7 @@ const agregarTarea = async (req, res) => {
 
   if (!proyecto) {
     const error = new Error("Tarea no encontrada");
+
     return res.status(404).json({ msg: error.message });
   }
 
@@ -41,6 +42,9 @@ const agregarTarea = async (req, res) => {
   try {
     const tareaAlmacenada = await Tarea.create(req.body);
 
+    proyecto.tareas.push(tareaAlmacenada);
+
+    proyecto.save();
     res.json({ tareaAlmacenada });
   } catch (err) {
     console.log(err);

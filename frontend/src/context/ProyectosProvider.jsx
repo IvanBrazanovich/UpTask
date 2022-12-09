@@ -1,5 +1,6 @@
 import { useEffect, useState, createContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { agregarTarea } from "../../../backend/controller/tareasController";
 
 const ProyectosContext = createContext();
 
@@ -9,10 +10,11 @@ const ProyectosProvider = ({ children }) => {
   const [alerta, setAlerta] = useState({});
   const [proyecto, setProyecto] = useState({});
   const [cargando, setCargando] = useState(false);
+  const [modalFormularioTarea, setModalFormularioTarea] = useState(false);
+  const [tarea, setTarea] = useState({});
 
   //React Router
   const navigate = useNavigate();
-  const params = useParams();
 
   //Functions
   const getProyectos = async () => {
@@ -232,7 +234,7 @@ const ProyectosProvider = ({ children }) => {
       if (!resOne.ok) {
         throw resTwo.msg;
       }
-
+      console.log(resTwo);
       setProyecto(resTwo.proyecto);
     } catch (err) {
       const message = err.message ? "Hubo un error" : err;
@@ -245,9 +247,106 @@ const ProyectosProvider = ({ children }) => {
     setCargando(false);
   };
 
+  //Close and open modal formuolario tarea
+  const handleModalFormularioTarea = (e) => {
+    setModalFormularioTarea(!modalFormularioTarea);
+  };
+
+  //TAREAS
+  const submitTarea = async (datos) => {
+    if (datos.id) {
+      editarTarea(datos);
+    } else {
+      agregarTarea(datos);
+    }
+  };
+
+  const editarTarea = async (datos) => {
+    //Check if there is a token
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    try {
+      const resOne = await fetch(
+        `http://localhost:4000/api/tareas/${datos.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(datos),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const resTwo = await resOne.json();
+
+      if (!resOne.ok) {
+        throw resTwo.msg;
+      }
+
+      mostrarAlerta({
+        msg: "La tarea se editó ",
+        error: false,
+      });
+    } catch (err) {
+      const message = err.message ? "Hubo un error" : err;
+      mostrarAlerta({
+        msg: message,
+        error: true,
+      });
+    }
+  };
+
+  const agregarTarea = async (datos) => {
+    //Check if there is a token
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    try {
+      const resOne = await fetch("http://localhost:4000/api/tareas/", {
+        method: "POST",
+        body: JSON.stringify(datos),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const resTwo = await resOne.json();
+
+      if (!resOne.ok) {
+        throw resTwo.msg;
+      }
+
+      mostrarAlerta({
+        msg: "La tarea se agregó ",
+        error: false,
+      });
+
+      console.log(resTwo);
+      const proyectosActualizado = {
+        ...proyecto,
+        tareas: [...proyecto.tareas, resTwo],
+      };
+    } catch (err) {
+      const message = err.message ? "Hubo un error" : err;
+      mostrarAlerta({
+        msg: message,
+        error: true,
+      });
+    }
+  };
+
+  const handleSubmitEditarTarea = (tarea) => {
+    setTarea(tarea);
+    setModalFormularioTarea(true);
+  };
+
   return (
     <ProyectosContext.Provider
       value={{
+        tarea,
         cargando,
         alerta,
         agregarProyecto,
@@ -258,6 +357,10 @@ const ProyectosProvider = ({ children }) => {
         getProyecto,
         deleteProyecto,
         proyecto,
+        handleModalFormularioTarea,
+        handleSubmitEditarTarea,
+        modalFormularioTarea,
+        submitTarea,
       }}
     >
       {children}

@@ -63,14 +63,12 @@ const autenticar = async (req, res) => {
       return res.status(404).json({ msg: error.message });
     }
   } catch (err) {
-    console.log("No pasa pa");
+    console.log(err);
   }
 };
 
 const confirmar = async (req, res) => {
   const token = req.params.token;
-
-  console.log(req.params.token);
 
   const usuarioConfirmado = await Usuario.findOne({ token });
 
