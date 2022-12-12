@@ -25,7 +25,7 @@ router
   .put(checkAuth, editarProyecto)
   .delete(checkAuth, eliminarProyecto);
 
-router.get("/colaboradores/:id", checkAuth, buscarColaborador);
+router.post("/colaboradores", checkAuth, buscarColaborador);
 router.post("/colaboradores/:id", checkAuth, agregarColaborador);
 router.post("/eliminar-colaboradores/:id", checkAuth, eliminarColaborador);
 

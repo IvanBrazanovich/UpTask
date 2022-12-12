@@ -32,7 +32,7 @@ const FormularioColaborador = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white mt-10 rounded-md py-10 px-5 md:w-2/3 lg:w-3/5 mx-auto "
+      className="bg-white my-10 rounded-md py-10 px-5  "
     >
       {alerta.msg && <Alert alerta={alerta} />}
 

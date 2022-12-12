@@ -11,6 +11,7 @@ const ProyectosProvider = ({ children }) => {
   const [cargando, setCargando] = useState(false);
   const [modalFormularioTarea, setModalFormularioTarea] = useState(false);
   const [tarea, setTarea] = useState({});
+  const [colaborador, setColaborador] = useState({});
 
   //React Router
   const navigate = useNavigate();
@@ -394,7 +395,7 @@ const ProyectosProvider = ({ children }) => {
 
     try {
       const resOne = await fetch(
-        `http://localhost:4000/proyectos/buscar-colaborador/${proyecto._id}`,
+        `http://localhost:4000/api/proyectos/colaboradores`,
         {
           method: "POST",
           body: JSON.stringify({ email }),
@@ -404,16 +405,38 @@ const ProyectosProvider = ({ children }) => {
           },
         }
       );
-      console.log(resOne);
+
       const resTwo = await resOne.json();
-      console.log(resTwo, resOne);
+
       if (!resOne.ok) {
         throw resTwo.msg;
       }
 
+      setColaborador(resTwo);
       console.log(resTwo);
     } catch (err) {
       console.log({ err });
+      const message = err.message ? "Hubo un error" : err;
+      mostrarAlerta({
+        msg: message,
+        error: true,
+      });
+    }
+  };
+
+  const agregarColaborador = async (id) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    try {
+      const resOne = await fetch(
+        `http://localhost:4000/api/proyectos/colaboradores/${proyecto._id}`,
+        {
+          method: "POST",
+        }
+      );
+    } catch (err) {
       const message = err.message ? "Hubo un error" : err;
       mostrarAlerta({
         msg: message,
@@ -429,6 +452,7 @@ const ProyectosProvider = ({ children }) => {
         handleDeleteTarea,
         tarea,
         cargando,
+        agregarColaborador,
         alerta,
         agregarProyecto,
         mostrarAlerta,
@@ -444,6 +468,7 @@ const ProyectosProvider = ({ children }) => {
         handleSubmitEditarTarea,
         modalFormularioTarea,
         submitTarea,
+        colaborador,
       }}
     >
       {children}

@@ -7,7 +7,7 @@ const Alert = ({ alerta }) => {
     <div
       className={`${
         error ? "  from-red-600 to-red-700" : "from-sky-600 to-sky-700"
-      } my-5 text-center py-1 bg-gradient-to-r uppercase font-semibold text-white `}
+      } my-5 text-center rounded-md py-2 bg-gradient-to-r uppercase font-semibold text-white `}
     >
       {msg}
     </div>
