@@ -1,14 +1,20 @@
 import React, { useEffect } from "react";
 import { useContext } from "react";
 import { Link, useParams } from "react-router-dom";
+import Alert from "../components/Alert";
 import ModalFormularioTarea from "../components/ModalFormularioTarea";
 import Tarea from "../components/Tarea";
 import ProyectosContext from "../context/ProyectosProvider";
 
 const Proyecto = () => {
   //Context
-  const { getProyecto, cargando, proyecto, handleModalFormularioTarea } =
-    useContext(ProyectosContext);
+  const {
+    getProyecto,
+    cargando,
+    proyecto,
+    handleModalFormularioTarea,
+    alerta,
+  } = useContext(ProyectosContext);
 
   //React router
   const params = useParams();
@@ -30,7 +36,7 @@ const Proyecto = () => {
 
           <Link
             to={`/proyectos/editar/${_id}`}
-            className="flex uppercase font-bold text-gray-500"
+            className="flex uppercase font-bold hover:text-black text-gray-500"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -49,7 +55,6 @@ const Proyecto = () => {
             <h2>Editar</h2>
           </Link>
         </div>
-
         <button
           onClick={handleModalFormularioTarea}
           className="bg-sky-500 text-white flex rounded-md p-3 mt-3 gap-1 uppercase font-semibold  "
@@ -68,11 +73,25 @@ const Proyecto = () => {
           </svg>
           <h2>Nueva Tarea</h2>
         </button>
-
+        {alerta.msg && <Alert alerta={alerta} />}
         <div className="my-10">
+          <h2 className="my-5 font-bold">Tareas del Proyecto</h2>
           {proyecto?.tareas?.map((tarea) => {
             return <Tarea key={tarea._id} tarea={tarea} />;
           })}
+        </div>
+
+        <div>
+          <div className="flex justify-between items-center">
+            <h2 className="font-bold my-5">Colaboradores</h2>
+
+            <Link
+              to={`/proyectos/nuevo-colaborador/${_id}`}
+              className="flex uppercase font-bold hover:text-black text-gray-500"
+            >
+              Añadir
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -93,11 +93,16 @@ const eliminarProyecto = async (req, res) => {
   }
 };
 
+const buscarColaborador = async (req, res) => {
+  console.log("hola");
+  console.log(req.body, req.usuario, req.params);
+};
 const agregarColaborador = async (req, res) => {};
 
 const eliminarColaborador = async (req, res) => {};
 
 export {
+  buscarColaborador,
   obtenerProyectos,
   nuevoProyecto,
   obtenerProyecto,

@@ -20,6 +20,7 @@ const ModalFormularioTarea = () => {
   //CONTEXT
   const {
     submitTarea,
+    setTarea,
     alerta,
     mostrarAlerta,
     modalFormularioTarea,
@@ -69,6 +70,7 @@ const ModalFormularioTarea = () => {
       prioridad,
     });
 
+    setTarea({});
     setNombre("");
     setDescripcion("");
     setFechaEntrega("");

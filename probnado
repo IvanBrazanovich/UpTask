@@ -1,5 +1,6 @@
 import { useEffect, useState, createContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { agregarTarea } from "../../../backend/controller/tareasController";
 
 const ProyectosContext = createContext();
 
@@ -105,6 +106,7 @@ const ProyectosProvider = ({ children }) => {
       const proyectosActualizados = proyectos.map((item) =>
         item._id === resTwo._id ? resTwo : item
       );
+      console.log(proyectosActualizados);
 
       setProyectos(proyectosActualizados);
 
@@ -232,6 +234,7 @@ const ProyectosProvider = ({ children }) => {
       if (!resOne.ok) {
         throw resTwo.msg;
       }
+      console.log(resTwo);
       setProyecto(resTwo.proyecto);
     } catch (err) {
       const message = err.message ? "Hubo un error" : err;
@@ -244,11 +247,17 @@ const ProyectosProvider = ({ children }) => {
     setCargando(false);
   };
 
+  //Close and open modal formuolario tarea
+  const handleModalFormularioTarea = (e) => {
+    setModalFormularioTarea(!modalFormularioTarea);
+  };
+
+  //TAREAS
   const submitTarea = async (datos) => {
     if (datos.id) {
-      await editarTarea(datos);
+      editarTarea(datos);
     } else {
-      await agregarTarea(datos);
+      agregarTarea(datos);
     }
   };
 
@@ -280,11 +289,6 @@ const ProyectosProvider = ({ children }) => {
         msg: "La tarea se editó ",
         error: false,
       });
-
-      const tareasActualizadas = { ...proyecto }.tareas.map((tarea) =>
-        tarea._id === resTwo._id ? resTwo : tarea
-      );
-      setProyecto({ ...proyecto, tareas: tareasActualizadas });
     } catch (err) {
       const message = err.message ? "Hubo un error" : err;
       mostrarAlerta({
@@ -292,7 +296,6 @@ const ProyectosProvider = ({ children }) => {
         error: true,
       });
     }
-    setModalFormularioTarea(false);
   };
 
   const agregarTarea = async (datos) => {
@@ -321,12 +324,11 @@ const ProyectosProvider = ({ children }) => {
         error: false,
       });
 
+      console.log(resTwo);
       const proyectosActualizado = {
         ...proyecto,
-        tareas: [...proyecto.tareas, resTwo.tareaAlmacenada],
+        tareas: [...proyecto.tareas, resTwo],
       };
-
-      setProyecto(proyectosActualizado);
     } catch (err) {
       const message = err.message ? "Hubo un error" : err;
       mostrarAlerta({
@@ -334,12 +336,6 @@ const ProyectosProvider = ({ children }) => {
         error: true,
       });
     }
-    setModalFormularioTarea(false);
-  };
-
-  //Close and open modal formuolario tarea
-  const handleModalFormularioTarea = (e) => {
-    setModalFormularioTarea(!modalFormularioTarea);
   };
 
   const handleSubmitEditarTarea = (tarea) => {
@@ -347,86 +343,9 @@ const ProyectosProvider = ({ children }) => {
     setModalFormularioTarea(true);
   };
 
-  const handleDeleteTarea = async (id) => {
-    //Check if there is a token
-    const token = localStorage.getItem("token");
-
-    if (!token) return;
-
-    try {
-      const resOne = await fetch(`http://localhost:4000/api/tareas/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const resTwo = await resOne.json();
-
-      if (!resOne.ok) {
-        throw resTwo.msg;
-      }
-
-      mostrarAlerta({
-        msg: "La tarea se eliminó ",
-        error: false,
-      });
-
-      const tareasActualizadas = { ...proyecto }.tareas.filter(
-        (item) => item._id !== id
-      );
-
-      setProyecto({ ...proyecto, tareas: tareasActualizadas });
-    } catch (err) {
-      const message = err.message ? "Hubo un error" : err;
-      mostrarAlerta({
-        msg: message,
-        error: true,
-      });
-    }
-  };
-
-  // COLABORADOR
-  const buscarColaborador = async (email) => {
-    const token = localStorage.getItem("token");
-
-    if (!token) return;
-
-    try {
-      const resOne = await fetch(
-        `http://localhost:4000/proyectos/buscar-colaborador/${proyecto._id}`,
-        {
-          method: "POST",
-          body: JSON.stringify({ email }),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(resOne);
-      const resTwo = await resOne.json();
-      console.log(resTwo, resOne);
-      if (!resOne.ok) {
-        throw resTwo.msg;
-      }
-
-      console.log(resTwo);
-    } catch (err) {
-      console.log({ err });
-      const message = err.message ? "Hubo un error" : err;
-      mostrarAlerta({
-        msg: message,
-        error: true,
-      });
-    }
-  };
-
   return (
     <ProyectosContext.Provider
       value={{
-        buscarColaborador,
-        handleDeleteTarea,
         tarea,
         cargando,
         alerta,
@@ -438,8 +357,6 @@ const ProyectosProvider = ({ children }) => {
         getProyecto,
         deleteProyecto,
         proyecto,
-        setTarea,
-        buscarColaborador,
         handleModalFormularioTarea,
         handleSubmitEditarTarea,
         modalFormularioTarea,
