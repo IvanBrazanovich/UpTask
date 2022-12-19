@@ -38,7 +38,6 @@ const AuthProvider = ({ children }) => {
         }
 
         setAuth(resTwo);
-        navigate("/proyectos");
       } catch (err) {
         console.log(err);
       }
@@ -47,8 +46,12 @@ const AuthProvider = ({ children }) => {
     auntenticar();
   }, []);
 
+  const cerrarAuth = () => {
+    setAuth({});
+  };
+
   return (
-    <AuthContext.Provider value={{ setAuth, auth, cargando }}>
+    <AuthContext.Provider value={{ cerrarAuth, setAuth, auth, cargando }}>
       {children}
     </AuthContext.Provider>
   );

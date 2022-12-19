@@ -1,21 +1,19 @@
 import React, { useContext } from "react";
 import ProyectosContext from "../context/ProyectosProvider";
 
-const Colaborador = () => {
-  const {
-    colaborador: { nombre, _id },
-    agregarColaborador,
-  } = useContext(ProyectosContext);
+const Colaborador = ({ colaborador }) => {
+  const { nombre } = colaborador;
 
+  const { eliminarColaborador } = useContext(ProyectosContext);
   return (
-    <div className="flex justify-between items-center">
-      <h2 className="text-sm uppercase font-bold text-slate-700">{nombre}</h2>
+    <div className="border-b p-3 flex  items-center justify-between">
+      <h2 className="text-xl   font-semibold">{nombre}</h2>
 
       <button
-        onClick={(e) => agregarColaborador(_id)}
-        className="uppercase  text-sm font-bold bg-gray-500 text-white p-2 rounded-md"
+        onClick={() => eliminarColaborador(colaborador._id)}
+        className="rounded-md p-2 bg-red-600 text-white font-bold uppercase "
       >
-        Agregar al Proyecto
+        Eliminar
       </button>
     </div>
   );

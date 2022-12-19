@@ -235,14 +235,16 @@ const ProyectosProvider = ({ children }) => {
       }
       setProyecto(resTwo.proyecto);
     } catch (err) {
+      navigate("/proyectos");
       const message = err.message ? "Hubo un error" : err;
-      mostrarAlerta({
+      setAlerta({
         msg: message,
         error: true,
       });
     }
 
     setCargando(false);
+    setAlerta({});
   };
 
   const submitTarea = async (datos) => {
@@ -252,6 +254,8 @@ const ProyectosProvider = ({ children }) => {
       await agregarTarea(datos);
     }
   };
+
+  // TAREAS
 
   const editarTarea = async (datos) => {
     //Check if there is a token
@@ -338,6 +342,44 @@ const ProyectosProvider = ({ children }) => {
     setModalFormularioTarea(false);
   };
 
+  const estadoTarea = async (id) => {
+    //Check if there is a token
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    try {
+      const resOne = await fetch(
+        `http://localhost:4000/api/tareas/estado/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const resTwo = await resOne.json();
+
+      if (!resOne.ok) {
+        throw resTwo.msg;
+      }
+
+      const tareasActualizadas = { ...proyecto }.tareas.map((tarea) =>
+        tarea._id === resTwo._id ? resTwo : tarea
+      );
+
+      setProyecto({ ...proyecto, tareas: tareasActualizadas });
+    } catch (err) {
+      const message = err.message ? "Hubo un error" : err;
+      mostrarAlerta({
+        msg: message,
+        error: true,
+      });
+    }
+  };
+
   //Close and open modal formuolario tarea
   const handleModalFormularioTarea = (e) => {
     setModalFormularioTarea(!modalFormularioTarea);
@@ -413,7 +455,6 @@ const ProyectosProvider = ({ children }) => {
       }
 
       setColaborador(resTwo);
-      console.log(resTwo);
     } catch (err) {
       console.log({ err });
       const message = err.message ? "Hubo un error" : err;
@@ -434,10 +475,70 @@ const ProyectosProvider = ({ children }) => {
         `http://localhost:4000/api/proyectos/colaboradores/${proyecto._id}`,
         {
           method: "POST",
+          body: JSON.stringify({ id }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
+      const resTwo = await resOne.json();
+
+      if (!resOne.ok) {
+        throw resTwo.msg;
+      }
+
+      mostrarAlerta({
+        msg: "Agregado correctamente",
+        error: false,
+      });
     } catch (err) {
       const message = err.message ? "Hubo un error" : err;
+
+      mostrarAlerta({
+        msg: message,
+        error: true,
+      });
+
+      setColaborador({});
+    }
+  };
+
+  const eliminarColaborador = async (id) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    try {
+      const resOne = await fetch(
+        `http://localhost:4000/api/proyectos/eliminar-colaboradores/${proyecto._id}`,
+        {
+          method: "POST",
+          body: JSON.stringify({ id }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const resTwo = await resOne.json();
+
+      if (!resOne.ok) {
+        throw resTwo.msg;
+      }
+
+      const nuevosColaboradores = proyecto.colaboradores.filter(
+        (colaborador) => colaborador._id !== id
+      );
+
+      setProyecto({ ...proyecto, colaboradores: nuevosColaboradores });
+      mostrarAlerta({
+        msg: "Eliminado correctamente",
+        error: false,
+      });
+    } catch (err) {
+      const message = err.message ? "Hubo un error" : err;
+
       mostrarAlerta({
         msg: message,
         error: true,
@@ -445,13 +546,23 @@ const ProyectosProvider = ({ children }) => {
     }
   };
 
+  //Cerrar sesión
+  const cerrarSesion = () => {
+    setProyecto({});
+    setProyectos([]);
+    setAlerta({});
+  };
+
   return (
     <ProyectosContext.Provider
       value={{
+        cerrarSesion,
+        eliminarColaborador,
         buscarColaborador,
         handleDeleteTarea,
         tarea,
         cargando,
+        setColaborador,
         agregarColaborador,
         alerta,
         agregarProyecto,
@@ -463,7 +574,7 @@ const ProyectosProvider = ({ children }) => {
         deleteProyecto,
         proyecto,
         setTarea,
-        buscarColaborador,
+        estadoTarea,
         handleModalFormularioTarea,
         handleSubmitEditarTarea,
         modalFormularioTarea,

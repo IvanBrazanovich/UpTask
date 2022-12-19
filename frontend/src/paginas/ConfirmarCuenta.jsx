@@ -8,7 +8,6 @@ const ConfirmarCuenta = () => {
   const id = useParams().id;
 
   useEffect(() => {
-    console.log("Se ejecuta");
     const confirmarCuenta = async () => {
       try {
         const resOne = await fetch(

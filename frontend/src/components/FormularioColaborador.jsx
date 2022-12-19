@@ -1,5 +1,6 @@
 import React from "react";
 import { useContext } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import ProyectosContext from "../context/ProyectosProvider";
 import Alert from "./Alert";
@@ -9,9 +10,19 @@ const FormularioColaborador = () => {
   //State
   const [email, setEmail] = useState("");
 
+  //Effect
+  useEffect(() => {
+    setColaborador({});
+  }, []);
+
   //Context
-  const { alerta, mostrarAlerta, buscarColaborador } =
-    useContext(ProyectosContext);
+  const {
+    setColaborador,
+    alerta,
+    colaborador,
+    mostrarAlerta,
+    buscarColaborador,
+  } = useContext(ProyectosContext);
 
   //Funciones
   const handleSubmit = (e) => {
@@ -34,7 +45,7 @@ const FormularioColaborador = () => {
       onSubmit={handleSubmit}
       className="bg-white my-10 rounded-md py-10 px-5  "
     >
-      {alerta.msg && <Alert alerta={alerta} />}
+      {alerta.msg && !colaborador._id && <Alert alerta={alerta} />}
 
       <div>
         <label htmlFor="email" className="block my-2 uppercase font-bold">
